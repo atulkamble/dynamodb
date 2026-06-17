@@ -1,6 +1,6 @@
-# Amazon DynamoDB - Complete Training Guide
+# Amazon DynamoDB 
 
-## Course Objectives
+## Objectives
 
 After completing this module, students will understand:
 
