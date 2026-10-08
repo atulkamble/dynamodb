@@ -1,4 +1,4 @@
-# AWS DynamoDB – Short Notes & Hands-On Guide
+# AWS DynamoDB 
 
 Topics: Introduction • Table Creation • Inserting Items • AWS CLI Practice
 
