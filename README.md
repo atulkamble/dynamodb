@@ -1,3 +1,219 @@
+# AWS DynamoDB – Short Notes & Hands-On Guide
+
+Topics: Introduction • Table Creation • Inserting Items • AWS CLI Practice
+
+## 1. Introduction to AWS DynamoDB
+
+Amazon DynamoDB is a fully managed, serverless NoSQL database service provided by AWS. It stores data as key-value pairs and documents, with low-latency access at scale.
+
+### Key points to remember
+
+- Fully managed NoSQL database.
+- No database server installation required.
+- Stores data in tables, items and attributes.
+- Uses primary keys to identify items.
+- Automatically scales to handle workloads.
+- Supports on-demand and provisioned capacity modes.
+- Supports backup, encryption and point-in-time recovery.
+- Integrates with AWS Lambda, API Gateway and IAM.
+
+## 2. DynamoDB Architecture
+
+Flow: Client → API Gateway → Lambda → DynamoDB Table → Data Storage
+
+## 3. Important Terms & Definitions
+
+| Term             | Definition                                    |
+| ---------------- | --------------------------------------------- |
+| Table            | Collection of items                           |
+| Item             | Single record in a table                      |
+| Attribute        | Field within an item                          |
+| Partition Key    | Primary key component used to distribute data |
+| Sort Key         | Optional second key component                 |
+| Primary Key      | Uniquely identifies an item                   |
+| RCU              | Read Capacity Unit                            |
+| WCU              | Write Capacity Unit                           |
+| GSI              | Global Secondary Index                        |
+| LSI              | Local Secondary Index                         |
+| TTL              | Time to Live, automatic item expiration       |
+| DynamoDB Streams | Captures item-level changes                   |
+
+## 4. DynamoDB vs RDS
+
+| Feature     | DynamoDB               | Amazon RDS               |
+| ----------- | ---------------------- | ------------------------ |
+| Database    | NoSQL                  | Relational               |
+| Data format | Items and attributes   | Rows and columns         |
+| Schema      | Flexible attributes    | Defined table schema     |
+| Query       | DynamoDB API / PartiQL | SQL                      |
+| Scaling     | Managed scaling        | Instance/storage scaling |
+| Joins       | Not supported natively | Supported                |
+
+## 5. Creating a Table in DynamoDB
+
+### AWS Console steps
+
+1. Open AWS Console → DynamoDB.
+2. Select Tables → Create table.
+3. Table name: `Employees`.
+4. Partition key: `EmployeeID` (String).
+5. Sort key: Optional (leave blank).
+6. Table settings: Default settings (on-demand).
+7. Click Create table.
+8. Wait for status Active.
+
+### AWS CLI – Create Table
+
+```
+aws dynamodb create-table \
+  --table-name Employees \
+  --attribute-definitions \
+    AttributeName=EmployeeID,AttributeType=S \
+  --key-schema \
+    AttributeName=EmployeeID,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST
+```
+
+Verify:
+
+```
+aws dynamodb list-tables
+
+aws dynamodb describe-table \
+  --table-name Employees
+```
+
+## 6. Inserting Values into DynamoDB
+
+### AWS Console steps
+
+1. DynamoDB → Tables → `Employees`.
+2. Select Explore table items.
+3. Click Create item.
+4. Add attributes and values.
+5. Click Create item.
+
+### Sample data
+
+| EmployeeID | Name  | Department | Salary |
+| ---------- | ----- | ---------- | ------ |
+| E101       | Atul  | IT         | 80000  |
+| E102       | Ravi  | DevOps     | 65000  |
+| E103       | Sneha | HR         | 55000  |
+
+### AWS CLI – Insert Single Item
+
+```
+aws dynamodb put-item \
+  --table-name Employees \
+  --item '{
+    "EmployeeID": {"S": "E101"},
+    "Name": {"S": "Atul"},
+    "Department": {"S": "IT"},
+    "Salary": {"N": "80000"}
+  }'
+```
+
+### Insert Another Item
+
+```
+aws dynamodb put-item \
+  --table-name Employees \
+  --item '{
+    "EmployeeID": {"S": "E102"},
+    "Name": {"S": "Ravi"},
+    "Department": {"S": "DevOps"},
+    "Salary": {"N": "65000"}
+  }'
+```
+
+## 7. Read, Update and Delete Items
+
+| Operation      | AWS CLI command                                      |
+| -------------- | ---------------------------------------------------- |
+| List tables    | `aws dynamodb list-tables`                           |
+| Read all items | `aws dynamodb scan --table-name Employees`           |
+| Describe table | `aws dynamodb describe-table --table-name Employees` |
+| Delete table   | `aws dynamodb delete-table --table-name Employees`   |
+
+### Read One Item
+
+```
+aws dynamodb get-item \
+  --table-name Employees \
+  --key '{"EmployeeID":{"S":"E101"}}'
+```
+
+### Update Salary
+
+```
+aws dynamodb update-item \
+  --table-name Employees \
+  --key '{"EmployeeID":{"S":"E101"}}' \
+  --update-expression "SET Salary = :s" \
+  --expression-attribute-values \
+    '{":s":{"N":"90000"}}'
+```
+
+### Delete One Item
+
+```
+aws dynamodb delete-item \
+  --table-name Employees \
+  --key '{"EmployeeID":{"S":"E102"}}'
+```
+
+## 8. DynamoDB Data Types
+
+| Type       | Symbol | Example           |
+| ---------- | ------ | ----------------- |
+| String     | S      | `"Atul"`          |
+| Number     | N      | `"80000"`         |
+| Boolean    | BOOL   | `true`            |
+| Binary     | B      | Binary data       |
+| List       | L      | `["AWS","Azure"]` |
+| Map        | M      | Nested attributes |
+| Null       | NULL   | `true`            |
+| String Set | SS     | `["AWS","GCP"]`   |
+
+## 9. Points to Remember for Interviews
+
+- DynamoDB is a NoSQL, not a relational database.
+- Every item requires a primary key.
+- Primary keys can be partition-only or partition + sort key.
+- `PutItem` creates or replaces an item with the same primary key.
+- `GetItem` retrieves an item using its complete primary key.
+- `Query` efficiently retrieves items using a partition key.
+- `Scan` reads items across the table or index and can be expensive.
+- On-demand billing charges for consumed requests and storage.
+- DynamoDB supports eventual and strong consistency for applicable reads.
+- DynamoDB Streams integrates with Lambda for event-driven processing.
+
+## 10. Quick Hands-On Practice
+
+Lab checklist
+
+0/7 completed
+
+Create Employees table
+
+Insert E101 and E102
+
+View all items using Scan
+
+Get Employee E101
+
+Update E101 salary
+
+Delete Employee E102
+
+Delete table after practice
+
+Learning outcome: Create a DynamoDB table, insert employee records, retrieve records, update attributes and delete items using the AWS Console and CLI.
+
+Cost reminder: DynamoDB can incur charges for requests, storage, backups and other features. Delete unused lab resources after practice.
+
+
 # Amazon DynamoDB 
 
 ## Objectives
